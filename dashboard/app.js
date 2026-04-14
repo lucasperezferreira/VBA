@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   const mats=[...new Set(DATA.map(p=>p.materia))].sort();
   mats.forEach(m=>{document.getElementById('sMat').innerHTML+=`<option>${m}</option>`});
 
-  ['srch','sFase','sRes','sMat'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{page=0;update()}));
+  document.getElementById('srch').addEventListener('input',()=>{page=0;update()});
+  ['sFase','sRes','sMat'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{page=0;update()}));
   document.getElementById('btnPrev').addEventListener('click',()=>{page=Math.max(0,page-1);renderTable(filtered())});
   document.getElementById('btnNext').addEventListener('click',()=>{page++;renderTable(filtered())});
 
