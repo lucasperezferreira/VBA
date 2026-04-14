@@ -3,83 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juri | Dashboard — Mora, Silva e Pereira</title>
+<title>JuriCapital | Dashboard — Mora, Silva e Pereira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--dark:#373A36;--gold:#F2A900;--dgold:#D28B00;--white:#fff;--bg:#F7F6F4;--border:#E5E4E0;--text:#1E201D;--muted:#6B6E68}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
-header{background:var(--dark);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:10px}
-.logo svg{width:32px;height:40px}
-.logo-txt{color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.5px}
+:root{--dark:#373A36;--gold:#F2A900;--dgold:#D28B00;--white:#fff;--bg:#F0EFED;--border:#E2E1DC;--text:#1E201D;--muted:#6B6E68;--card:#fff}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+header{background:var(--dark);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo svg{width:36px;height:36px}
+.logo-txt{color:#fff;font-size:20px;font-weight:800;letter-spacing:-0.3px;font-family:'Montserrat',sans-serif}
 .logo-txt span{color:var(--gold)}
 .hdr-info{text-align:right}
-.hdr-info h2{color:#fff;font-size:14px;font-weight:600}
-.hdr-info p{color:#999;font-size:12px;margin-top:3px}
-main{max-width:1400px;margin:0 auto;padding:24px 32px}
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px;margin-top:24px}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.kpi{background:#fff;border-radius:10px;padding:18px 20px;border:1px solid var(--border);border-left:4px solid var(--gold)}
-.kpi.dark{border-left-color:var(--dark)}
-.kpi .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:6px}
-.kpi .val{font-size:26px;font-weight:800;line-height:1;color:var(--text)}
-.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}
-.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.chart-card{background:#fff;border-radius:10px;padding:18px 20px;border:1px solid var(--border)}
-.chart-card h3{font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
-.chart-wrap{position:relative;height:210px}
-.filters{background:#fff;border-radius:10px;padding:14px 18px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.fg{display:flex;align-items:center;gap:6px;flex:1;min-width:160px}
-.fg label{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;text-transform:uppercase}
-input[type=text],select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#fff;width:100%}
-input[type=text]:focus,select:focus{outline:none;border-color:var(--gold)}
-.btn-xl{background:var(--gold);color:var(--dark);border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
-.btn-xl:hover{background:var(--dgold)}
-.tbl-card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden}
-.tbl-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.tbl-hdr h3{font-size:14px;font-weight:700}
-.tbl-count{font-size:12px;color:var(--muted)}
+.hdr-info h2{color:#fff;font-size:13px;font-weight:600;letter-spacing:.2px}
+.hdr-info p{color:#aaa;font-size:11px;margin-top:4px;font-weight:500}
+main{max-width:1440px;margin:0 auto;padding:28px 40px}
+.sec-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px;margin-top:28px;display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--gold);border-radius:2px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.kpi{background:var(--card);border-radius:12px;padding:20px 22px;border:1px solid var(--border);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.kpi::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--gold);border-radius:0}
+.kpi.dark::after{background:var(--dark);border:2px solid var(--border)}
+.kpi .lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin-bottom:10px}
+.kpi .val{font-size:28px;font-weight:900;line-height:1;color:var(--text)}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:6px;font-weight:500}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-card{background:var(--card);border-radius:12px;padding:20px 22px;border:1px solid var(--border)}
+.chart-card h3{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);color:var(--text)}
+.chart-wrap{position:relative;height:215px}
+.filters{background:var(--card);border-radius:12px;padding:16px 20px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:150px}
+.fg label{font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.7px}
+input[type=text],select{padding:8px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;font-weight:500;color:var(--text);background:#fff;width:100%;transition:border-color .15s}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,169,0,.12)}
+.btn-xl{background:var(--gold);color:var(--dark);border:none;padding:9px 18px;border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;font-weight:800;cursor:pointer;white-space:nowrap;letter-spacing:.3px;transition:background .15s,transform .1s}
+.btn-xl:hover{background:var(--dgold);transform:translateY(-1px)}
+.tbl-card{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.tbl-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.tbl-hdr h3{font-size:13px;font-weight:800;letter-spacing:.2px}
+.tbl-count{font-size:12px;color:var(--muted);font-weight:500}
 .tbl-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{background:#F9F8F6;padding:9px 11px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
-thead th:hover{background:#EEECEA}
+thead th{background:#F5F4F1;padding:10px 12px;text-align:left;font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);white-space:nowrap;border-bottom:2px solid var(--border);cursor:pointer;user-select:none;font-family:'Montserrat',sans-serif}
+thead th:hover{background:#EEECE8;color:var(--text)}
 tbody tr{border-bottom:1px solid var(--border)}
 tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:#FAFAF8}
-td{padding:9px 11px;vertical-align:middle}
+tbody tr:hover{background:#FAFAF7}
+td{padding:10px 12px;vertical-align:middle;font-weight:500}
 td.mono{font-family:monospace;font-size:11px}
 td.r{text-align:right;font-variant-numeric:tabular-nums}
-.b{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
-.b-pt{background:#E8F5E9;color:#2E7D32}
-.b-pp{background:#FFF8E1;color:#E65100}
-.b-im{background:#FFEBEE;color:#C62828}
-.b-ea{background:#E3F2FD;color:#1565C0}
+.b{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.b-pt{background:#E6F4EA;color:#1E7E34}
+.b-pp{background:#FFF3CD;color:#B45309}
+.b-im{background:#FDECEA;color:#B91C1C}
+.b-ea{background:#E8F0FE;color:#1A56DB}
 .b-ar{background:#ECEFF1;color:#546E7A}
-.b-f{background:#F3F0EB;color:var(--dark)}
-.sim{color:#2E7D32;font-weight:700}
-.nao{color:#C62828;font-weight:700}
-footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
-@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}main{padding:16px}header{flex-direction:column;gap:10px;text-align:center}.hdr-info{text-align:center}}
+.b-f{background:#F0EDE8;color:var(--dark)}
+.sim{color:#1E7E34;font-weight:700}
+.nao{color:#B91C1C;font-weight:700}
+footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-weight:500;border-top:1px solid var(--border);margin-top:8px}
+.qf-bar{background:var(--dark);padding:0 40px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.08)}
+.qf-label{color:#888;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-right:4px}
+.qf{background:transparent;border:1px solid rgba(255,255,255,.15);color:#bbb;padding:6px 16px;border-radius:20px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;transition:all .15s;margin:8px 0}
+.qf:hover{border-color:var(--gold);color:var(--gold)}
+.qf.active{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+.chart-full{grid-column:1/-1}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}main{padding:16px 20px}header{height:auto;padding:16px 20px;flex-direction:column;gap:10px;text-align:center}.hdr-info{text-align:center}.qf-bar{padding:0 20px;flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">
-    <svg viewBox="0 0 32 40" fill="none">
-      <rect x="6" y="0" width="22" height="8" rx="2" fill="#F2A900"/>
-      <rect x="16" y="6" width="12" height="22" fill="#F2A900"/>
-      <path d="M16 28 C16 36 6 38 6 38 L6 33 C11 33 12 30 12 28Z" fill="#D28B00"/>
-      <circle cx="6" cy="36" r="4" fill="#F2A900"/>
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Chevron/arrow shape inspired by JuriCapital brandbook -->
+      <polygon points="4,4 28,4 36,20 28,36 4,36 12,20" fill="#F2A900"/>
+      <polygon points="14,12 28,4 36,20 28,36 14,28 20,20" fill="#D28B00"/>
     </svg>
-    <span class="logo-txt">Juri<span>.</span></span>
+    <span class="logo-txt">Juri<span>Capital</span></span>
   </div>
   <div class="hdr-info">
     <h2>Dashboard de Carteira &mdash; Mora, Silva e Pereira Advogados</h2>
     <p id="hdrDate"></p>
   </div>
 </header>
+<div class="qf-bar">
+  <span class="qf-label">Visualizar:</span>
+  <button class="qf active" data-qf="all">Todos</button>
+  <button class="qf" data-qf="ativo">Ativos</button>
+  <button class="qf" data-qf="valor">Com Valor</button>
+  <button class="qf" data-qf="procedente">Procedentes</button>
+</div>
 <main>
   <div class="sec-title">Visão Geral</div>
   <div class="kpi-grid">
@@ -94,6 +112,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
     <div class="chart-card"><h3>Processos por Fase Processual</h3><div class="chart-wrap"><canvas id="cFase"></canvas></div></div>
     <div class="chart-card"><h3>Principais Reclamadas</h3><div class="chart-wrap"><canvas id="cReclamadas"></canvas></div></div>
     <div class="chart-card"><h3>Distribuição por Classe Processual</h3><div class="chart-wrap"><canvas id="cMaterias"></canvas></div></div>
+    <div class="chart-card chart-full"><h3>Processos por Setor (Reclamada)</h3><div class="chart-wrap" style="height:200px"><canvas id="cSetor"></canvas></div></div>
   </div>
   <div class="sec-title">Base de Processos</div>
   <div class="filters">
@@ -131,7 +150,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
     </div>
   </div>
 </main>
-<footer>Juri Ativos Judiciais S.A. &nbsp;|&nbsp; CNPJ 52.026.131/0001-41 &nbsp;|&nbsp; www.juri.capital</footer>
+<footer>JuriCapital &nbsp;&mdash;&nbsp; Juri Ativos Judiciais S.A. &nbsp;|&nbsp; CNPJ 52.026.131/0001-41 &nbsp;|&nbsp; www.juri.capital</footer>
 <script src="data.js"></script>
 <script src="app.js"></script>
 </body>
