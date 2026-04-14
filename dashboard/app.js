@@ -4,7 +4,7 @@ const D=s=>{if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`};
 const S=v=>`<span class="${v?'sim':'nao'}">${v?'Sim':'Não'}</span>`;
 const BR={'Procedente':'b-pt','Improcedente':'b-im','Arquivado':'b-ar','Ativo - Sem informação de sentença':'b-ea'};
 const bdg=(c,t)=>`<span class="b ${c}">${t}</span>`;
-let sortKey='numero_processo',sortAsc=true,page=0,activeQF='all';
+let sortKey='numero_processo',sortAsc=true,page=0;
 let chartFilter={field:null,value:null};
 const charts={};
 const PAGE_SIZE=200;
@@ -59,15 +59,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   const mats=[...new Set(DATA.map(p=>p.materia))].sort();
   mats.forEach(m=>{document.getElementById('sMat').innerHTML+=`<option>${m}</option>`});
 
-  document.querySelectorAll('.qf').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      document.querySelectorAll('.qf').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      activeQF=btn.dataset.qf;
-      page=0;update();
-    });
-  });
-
   ['srch','sFase','sRes','sMat'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{page=0;update()}));
   document.getElementById('btnPrev').addEventListener('click',()=>{page=Math.max(0,page-1);renderTable(filtered())});
   document.getElementById('btnNext').addEventListener('click',()=>{page++;renderTable(filtered())});
@@ -82,10 +73,6 @@ function filtered(){
   const r=document.getElementById('sRes').value;
   const m=document.getElementById('sMat').value;
   return DATA.filter(p=>{
-    // Quick filter
-    if(activeQF==='ativo'&&p.resultado==='Arquivado')return false;
-    if(activeQF==='valor'&&!(p.valor_est>0))return false;
-    if(activeQF==='procedente'&&p.resultado!=='Procedente')return false;
     // Chart filter
     if(chartFilter.field==='resultado'&&p.resultado!==chartFilter.value)return false;
     if(chartFilter.field==='fase'&&p.fase_atual!==chartFilter.value)return false;
