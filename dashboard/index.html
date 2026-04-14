@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Juri | Dashboard — Mora, Silva e Pereira</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--dark:#373A36;--gold:#F2A900;--dgold:#D28B00;--white:#fff;--bg:#F7F6F4;--border:#E5E4E0;--text:#1E201D;--muted:#6B6E68}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+header{background:var(--dark);padding:16px 32px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.logo svg{width:32px;height:40px}
+.logo-txt{color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.5px}
+.logo-txt span{color:var(--gold)}
+.hdr-info{text-align:right}
+.hdr-info h2{color:#fff;font-size:14px;font-weight:600}
+.hdr-info p{color:#999;font-size:12px;margin-top:3px}
+main{max-width:1400px;margin:0 auto;padding:24px 32px}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px;margin-top:24px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{background:#fff;border-radius:10px;padding:18px 20px;border:1px solid var(--border);border-left:4px solid var(--gold)}
+.kpi.dark{border-left-color:var(--dark)}
+.kpi .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:6px}
+.kpi .val{font-size:26px;font-weight:800;line-height:1;color:var(--text)}
+.kpi .sub{font-size:11px;color:var(--muted);margin-top:5px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.chart-card{background:#fff;border-radius:10px;padding:18px 20px;border:1px solid var(--border)}
+.chart-card h3{font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.chart-wrap{position:relative;height:210px}
+.filters{background:#fff;border-radius:10px;padding:14px 18px;border:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fg{display:flex;align-items:center;gap:6px;flex:1;min-width:160px}
+.fg label{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;text-transform:uppercase}
+input[type=text],select{padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);background:#fff;width:100%}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--gold)}
+.btn-xl{background:var(--gold);color:var(--dark);border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn-xl:hover{background:var(--dgold)}
+.tbl-card{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden}
+.tbl-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.tbl-hdr h3{font-size:14px;font-weight:700}
+.tbl-count{font-size:12px;color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:#F9F8F6;padding:9px 11px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);white-space:nowrap;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+thead th:hover{background:#EEECEA}
+tbody tr{border-bottom:1px solid var(--border)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#FAFAF8}
+td{padding:9px 11px;vertical-align:middle}
+td.mono{font-family:monospace;font-size:11px}
+td.r{text-align:right;font-variant-numeric:tabular-nums}
+.b{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.b-pt{background:#E8F5E9;color:#2E7D32}
+.b-pp{background:#FFF8E1;color:#E65100}
+.b-im{background:#FFEBEE;color:#C62828}
+.b-ea{background:#E3F2FD;color:#1565C0}
+.b-f{background:#F3F0EB;color:var(--dark)}
+.sim{color:#2E7D32;font-weight:700}
+.nao{color:#C62828;font-weight:700}
+footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}main{padding:16px}header{flex-direction:column;gap:10px;text-align:center}.hdr-info{text-align:center}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 32 40" fill="none">
+      <rect x="6" y="0" width="22" height="8" rx="2" fill="#F2A900"/>
+      <rect x="16" y="6" width="12" height="22" fill="#F2A900"/>
+      <path d="M16 28 C16 36 6 38 6 38 L6 33 C11 33 12 30 12 28Z" fill="#D28B00"/>
+      <circle cx="6" cy="36" r="4" fill="#F2A900"/>
+    </svg>
+    <span class="logo-txt">Juri<span>.</span></span>
+  </div>
+  <div class="hdr-info">
+    <h2>Dashboard de Carteira &mdash; Mora, Silva e Pereira Advogados</h2>
+    <p id="hdrDate"></p>
+  </div>
+</header>
+<main>
+  <div class="sec-title">Visão Geral</div>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="lbl">Total de Processos</div><div class="val" id="kTotal">—</div><div class="sub">carteira completa</div></div>
+    <div class="kpi"><div class="lbl">Valor Total Estimado</div><div class="val" id="kValor">—</div><div class="sub">soma dos valores estimados</div></div>
+    <div class="kpi dark"><div class="lbl">Taxa de Procedência</div><div class="val" id="kProc">—</div><div class="sub">total + parcial / c/ resultado</div></div>
+    <div class="kpi dark"><div class="lbl">Trânsito em Julgado</div><div class="val" id="kTJ">—</div><div class="sub">processos com TJ confirmado</div></div>
+  </div>
+  <div class="sec-title">Análise da Carteira</div>
+  <div class="charts-grid">
+    <div class="chart-card"><h3>Resultado das Ações</h3><div class="chart-wrap"><canvas id="cResultado"></canvas></div></div>
+    <div class="chart-card"><h3>Processos por Fase Processual</h3><div class="chart-wrap"><canvas id="cFase"></canvas></div></div>
+    <div class="chart-card"><h3>Principais Reclamadas</h3><div class="chart-wrap"><canvas id="cReclamadas"></canvas></div></div>
+    <div class="chart-card"><h3>Principais Matérias Discutidas</h3><div class="chart-wrap"><canvas id="cMaterias"></canvas></div></div>
+  </div>
+  <div class="sec-title">Base de Processos</div>
+  <div class="filters">
+    <div class="fg" style="flex:2"><label>Buscar</label><input type="text" id="srch" placeholder="nº processo, reclamante, reclamada..."></div>
+    <div class="fg"><label>Fase</label><select id="sFase"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Resultado</label><select id="sRes"><option value="">Todos</option><option>Procedente Total</option><option>Procedente Parcial</option><option>Improcedente</option><option>Em andamento</option></select></div>
+    <div class="fg"><label>Matéria</label><select id="sMat"><option value="">Todas</option></select></div>
+    <button class="btn-xl" onclick="exportXL()">&#11015; Exportar Excel</button>
+  </div>
+  <div style="height:12px"></div>
+  <div class="tbl-card">
+    <div class="tbl-hdr"><h3>Processos</h3><span class="tbl-count" id="tCount"></span></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th onclick="srt('numero_processo')">Nº Processo ↕</th>
+          <th onclick="srt('cumprimento_sentenca')">Cumpr. Sentença ↕</th>
+          <th onclick="srt('reclamante')">Reclamante ↕</th>
+          <th onclick="srt('reclamadas')">Reclamada ↕</th>
+          <th onclick="srt('sentenca')">Sentença</th>
+          <th onclick="srt('acordao')">Acórdão</th>
+          <th onclick="srt('transito_julgado')">TJ</th>
+          <th onclick="srt('fase_atual')">Fase ↕</th>
+          <th onclick="srt('ultima_mov')">Últ. Movim. ↕</th>
+          <th onclick="srt('resultado')">Resultado ↕</th>
+          <th onclick="srt('valor_est')">Vlr. Estimado ↕</th>
+          <th onclick="srt('calculos')">Cálculos</th>
+          <th onclick="srt('calc_hom')">Cálc. Hom.</th>
+          <th onclick="srt('vlr_hom')">Vlr. Hom. ↕</th>
+          <th onclick="srt('vlr_inc')">Vlr. Inconv. ↕</th>
+          <th onclick="srt('materia')">Matéria ↕</th>
+        </tr></thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<footer>Juri Ativos Judiciais S.A. &nbsp;|&nbsp; CNPJ 52.026.131/0001-41 &nbsp;|&nbsp; www.juri.capital</footer>
+<script src="app.js"></script>
+</body>
+</html>
