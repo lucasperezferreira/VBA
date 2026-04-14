@@ -6,6 +6,7 @@ const BR={'Procedente':'b-pt','Improcedente':'b-im','Arquivado':'b-ar','Ativo - 
 const bdg=(c,t)=>`<span class="b ${c}">${t}</span>`;
 let sortKey='numero_processo',sortAsc=true,page=0;
 let chartFilter={field:null,value:null};
+const sel={resultado:new Set(),fase:new Set(),classe:new Set()};
 const charts={};
 const PAGE_SIZE=200;
 const COLS=['#F2A900','#D28B00','#373A36','#7A7670','#B0ADA7','#5C9BD6','#2E7D32','#C62828'];
@@ -54,13 +55,23 @@ function updateFilterTag(){
 document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('hdrDate').textContent='Atualizado em: '+new Date().toLocaleDateString('pt-BR');
 
+  // Multi-selects
+  const resultados=['Procedente','Improcedente','Arquivado','Ativo - Sem informação de sentença'];
   const fases=[...new Set(DATA.map(p=>p.fase_atual))].sort();
-  fases.forEach(f=>{document.getElementById('sFase').innerHTML+=`<option>${f}</option>`});
   const mats=[...new Set(DATA.map(p=>p.materia))].sort();
-  mats.forEach(m=>{document.getElementById('sMat').innerHTML+=`<option>${m}</option>`});
+  buildMs('resultado','resultado',resultados);
+  buildMs('fase','fase',fases);
+  buildMs('classe','classe',mats);
 
   document.getElementById('srch').addEventListener('input',()=>{page=0;update()});
-  ['sFase','sRes','sMat'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{page=0;update()}));
+
+  // Fechar painéis ao clicar fora
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.ms-wrap')){
+      document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
+      document.querySelectorAll('.ms-btn.open').forEach(b=>b.classList.remove('open'));
+    }
+  });
   document.getElementById('btnPrev').addEventListener('click',()=>{page=Math.max(0,page-1);renderTable(filtered())});
   document.getElementById('btnNext').addEventListener('click',()=>{page++;renderTable(filtered())});
 
@@ -68,11 +79,45 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // --- Filter ---
+// --- Multi-select helpers ---
+function buildMs(id,field,options){
+  const panel=document.getElementById('ms-'+id+'-panel');
+  options.forEach(opt=>{
+    const div=document.createElement('div');
+    div.className='ms-item';
+    div.dataset.val=opt;
+    div.innerHTML=`<input type="checkbox" id="cb-${id}-${CSS.escape(opt)}"><span>${opt}</span>`;
+    div.querySelector('input').addEventListener('change',e=>{
+      e.target.checked?sel[field].add(opt):sel[field].delete(opt);
+      div.classList.toggle('checked',e.target.checked);
+      updateMsBtn(id,field);
+      page=0;update();
+    });
+    div.addEventListener('click',e=>{if(e.target.tagName!=='INPUT'){div.querySelector('input').click()}});
+    panel.appendChild(div);
+  });
+}
+
+function toggleMs(id){
+  const panel=document.getElementById('ms-'+id+'-panel');
+  const btn=document.getElementById('ms-'+id+'-btn');
+  const isOpen=panel.classList.contains('open');
+  // Fecha todos
+  document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.ms-btn.open').forEach(b=>b.classList.remove('open'));
+  if(!isOpen){panel.classList.add('open');btn.classList.add('open')}
+}
+
+function updateMsBtn(id,field){
+  const btn=document.getElementById('ms-'+id+'-btn');
+  const lbl=document.getElementById('ms-'+id+'-label');
+  const n=sel[field].size;
+  if(n===0){lbl.textContent=id==='resultado'?'Todos':'Todas';btn.classList.remove('active')}
+  else if(n===1){lbl.textContent=[...sel[field]][0];btn.classList.add('active')}
+  else{lbl.innerHTML=`<span class="ms-badge">${n}</span> selecionados`;btn.classList.add('active')}
+}
+
 function filtered(){
-  const s=document.getElementById('srch').value.toLowerCase();
-  const f=document.getElementById('sFase').value;
-  const r=document.getElementById('sRes').value;
-  const m=document.getElementById('sMat').value;
   return DATA.filter(p=>{
     // Chart filter
     if(chartFilter.field==='resultado'&&p.resultado!==chartFilter.value)return false;
@@ -80,11 +125,13 @@ function filtered(){
     if(chartFilter.field==='reclamada'&&p.reclamadas!==chartFilter.value)return false;
     if(chartFilter.field==='materia'&&p.materia!==chartFilter.value)return false;
     if(chartFilter.field==='setor'&&getSector(p.reclamadas)!==chartFilter.value)return false;
-    // Text/select filters
+    // Multi-selects
+    if(sel.resultado.size&&!sel.resultado.has(p.resultado))return false;
+    if(sel.fase.size&&!sel.fase.has(p.fase_atual))return false;
+    if(sel.classe.size&&!sel.classe.has(p.materia))return false;
+    // Busca
+    const s=document.getElementById('srch').value.toLowerCase();
     if(s&&!`${p.numero_processo} ${p.reclamante} ${p.reclamadas} ${p.cumprimento_sentenca||''}`.toLowerCase().includes(s))return false;
-    if(f&&p.fase_atual!==f)return false;
-    if(r&&p.resultado!==r)return false;
-    if(m&&p.materia!==m)return false;
     return true;
   }).sort((a,b)=>{
     let va=a[sortKey]??'',vb=b[sortKey]??'';

@@ -86,6 +86,20 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
 .cft-label{font-size:11px;color:var(--muted);font-weight:500}
 .cft-clear{background:none;border:1px solid var(--dgold);color:var(--dgold);border-radius:6px;padding:3px 10px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;transition:all .15s}
 .cft-clear:hover{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+.ms-wrap{position:relative}
+.ms-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#ccc;padding:6px 10px;border-radius:7px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:150px;justify-content:space-between;transition:all .15s;white-space:nowrap}
+.ms-btn:hover,.ms-btn.open{border-color:var(--gold);color:#fff}
+.ms-btn.active{border-color:var(--gold);color:#fff;background:rgba(242,169,0,.1)}
+.ms-btn svg{flex-shrink:0;transition:transform .2s}
+.ms-btn.open svg{transform:rotate(180deg)}
+.ms-badge{background:var(--gold);color:var(--dark);border-radius:10px;padding:1px 7px;font-size:10px;font-weight:800;line-height:1.6}
+.ms-panel{position:absolute;top:calc(100% + 6px);left:0;background:#2A2C29;border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:6px 0;min-width:210px;z-index:200;display:none;box-shadow:0 8px 28px rgba(0,0,0,.5)}
+.ms-panel.open{display:block}
+.ms-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;font-size:12px;color:#bbb;font-family:'Montserrat',sans-serif;font-weight:500;transition:background .1s;user-select:none}
+.ms-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.ms-item.checked{color:#fff;font-weight:700}
+.ms-item input[type=checkbox]{accent-color:var(--gold);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.ms-divider{height:1px;background:rgba(255,255,255,.08);margin:4px 0}
 .chart-full{grid-column:1/-1}
 .chart-card{cursor:pointer}
 .chart-card h3 .hint{font-size:9px;font-weight:500;color:var(--muted);margin-left:6px;letter-spacing:0;text-transform:none}
@@ -115,21 +129,33 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
   <div class="fb-sep"></div>
   <div class="fb-group">
     <label>Resultado</label>
-    <select class="fb-select" id="sRes">
-      <option value="">Todos</option>
-      <option>Procedente</option>
-      <option>Improcedente</option>
-      <option>Arquivado</option>
-      <option>Ativo - Sem informação de sentença</option>
-    </select>
+    <div class="ms-wrap">
+      <button class="ms-btn" id="ms-resultado-btn" onclick="toggleMs('resultado')">
+        <span id="ms-resultado-label">Todos</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#F2A900" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="ms-panel" id="ms-resultado-panel"></div>
+    </div>
   </div>
   <div class="fb-group">
     <label>Fase</label>
-    <select class="fb-select" id="sFase"><option value="">Todas</option></select>
+    <div class="ms-wrap">
+      <button class="ms-btn" id="ms-fase-btn" onclick="toggleMs('fase')">
+        <span id="ms-fase-label">Todas</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#F2A900" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="ms-panel" id="ms-fase-panel"></div>
+    </div>
   </div>
   <div class="fb-group">
     <label>Classe</label>
-    <select class="fb-select" id="sMat"><option value="">Todas</option></select>
+    <div class="ms-wrap">
+      <button class="ms-btn" id="ms-classe-btn" onclick="toggleMs('classe')">
+        <span id="ms-classe-label">Todas</span>
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#F2A900" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="ms-panel" id="ms-classe-panel"></div>
+    </div>
   </div>
   <div class="fb-actions">
     <a class="btn-ghost" href="../estudo%20moura%20%26%20nakano.xlsx" download>&#11015; Base Original</a>
