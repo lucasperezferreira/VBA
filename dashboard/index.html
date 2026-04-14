@@ -73,7 +73,17 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
 .qf:hover{border-color:var(--gold);color:var(--gold)}
 .qf.active{background:var(--gold);border-color:var(--gold);color:var(--dark)}
 .chart-full{grid-column:1/-1}
-@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}main{padding:16px 20px}header{height:auto;padding:16px 20px;flex-direction:column;gap:10px;text-align:center}.hdr-info{text-align:center}.qf-bar{padding:0 20px;flex-wrap:wrap}}
+.chart-card{cursor:pointer}
+.chart-card h3 .hint{font-size:9px;font-weight:500;color:var(--muted);margin-left:6px;letter-spacing:0;text-transform:none}
+.btn-dl{background:transparent;border:1px solid rgba(255,255,255,.3);color:#ccc;padding:6px 14px;border-radius:20px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;transition:all .15s;margin:8px 0;margin-left:auto;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.btn-dl:hover{border-color:var(--gold);color:var(--gold)}
+.cft-wrap{background:#FFF8E1;border-bottom:1px solid #F2A90044;padding:8px 40px;display:none;align-items:center;gap:10px}
+.cft-wrap.visible{display:flex}
+.cft-text{font-size:12px;font-weight:700;color:var(--dgold)}
+.cft-label{font-size:11px;color:var(--muted);font-weight:500}
+.cft-clear{background:none;border:1px solid var(--dgold);color:var(--dgold);border-radius:20px;padding:2px 10px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;transition:all .15s}
+.cft-clear:hover{background:var(--gold);border-color:var(--gold);color:var(--dark)}
+@media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}main{padding:16px 20px}header{height:auto;padding:16px 20px;flex-direction:column;gap:10px;text-align:center}.hdr-info{text-align:center}.qf-bar{padding:0 20px;flex-wrap:wrap}.cft-wrap{padding:8px 20px}}
 </style>
 </head>
 <body>
@@ -97,6 +107,12 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
   <button class="qf" data-qf="ativo">Ativos</button>
   <button class="qf" data-qf="valor">Com Valor</button>
   <button class="qf" data-qf="procedente">Procedentes</button>
+  <a class="btn-dl" href="../estudo%20moura%20%26%20nakano.xlsx" download>&#11015; Base Original</a>
+</div>
+<div class="cft-wrap" id="cftWrap">
+  <span class="cft-label">Filtrando por gráfico:</span>
+  <span class="cft-text" id="cftText"></span>
+  <button class="cft-clear" onclick="clearChartFilter()">✕ Limpar</button>
 </div>
 <main>
   <div class="sec-title">Visão Geral</div>
@@ -108,11 +124,11 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
   </div>
   <div class="sec-title">Análise da Carteira</div>
   <div class="charts-grid">
-    <div class="chart-card"><h3>Resultado das Ações</h3><div class="chart-wrap"><canvas id="cResultado"></canvas></div></div>
-    <div class="chart-card"><h3>Processos por Fase Processual</h3><div class="chart-wrap"><canvas id="cFase"></canvas></div></div>
-    <div class="chart-card"><h3>Principais Reclamadas</h3><div class="chart-wrap"><canvas id="cReclamadas"></canvas></div></div>
-    <div class="chart-card"><h3>Distribuição por Classe Processual</h3><div class="chart-wrap"><canvas id="cMaterias"></canvas></div></div>
-    <div class="chart-card chart-full"><h3>Processos por Setor (Reclamada)</h3><div class="chart-wrap" style="height:200px"><canvas id="cSetor"></canvas></div></div>
+    <div class="chart-card"><h3>Resultado das Ações<span class="hint">clique para filtrar</span></h3><div class="chart-wrap"><canvas id="cResultado"></canvas></div></div>
+    <div class="chart-card"><h3>Processos por Fase Processual<span class="hint">clique para filtrar</span></h3><div class="chart-wrap"><canvas id="cFase"></canvas></div></div>
+    <div class="chart-card"><h3>Principais Reclamadas<span class="hint">clique para filtrar</span></h3><div class="chart-wrap"><canvas id="cReclamadas"></canvas></div></div>
+    <div class="chart-card"><h3>Distribuição por Classe Processual<span class="hint">clique para filtrar</span></h3><div class="chart-wrap"><canvas id="cMaterias"></canvas></div></div>
+    <div class="chart-card chart-full"><h3>Processos por Setor (Reclamada)<span class="hint">clique para filtrar</span></h3><div class="chart-wrap" style="height:200px"><canvas id="cSetor"></canvas></div></div>
   </div>
   <div class="sec-title">Base de Processos</div>
   <div class="filters">
