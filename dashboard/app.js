@@ -4,7 +4,7 @@ const D=s=>{if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`};
 const S=v=>`<span class="${v?'sim':'nao'}">${v?'Sim':'Não'}</span>`;
 const BR={'Procedente':'b-pt','Improcedente':'b-im','Arquivado':'b-ar','Ativo - Sem informação de sentença':'b-ea'};
 const bdg=(c,t)=>`<span class="b ${c}">${t}</span>`;
-let sortKey='numero_processo',sortAsc=true,page=0;
+let sortKey='numero_processo',sortAsc=true,page=0,statusFilter='all';
 let chartFilter={field:null,value:null};
 const sel={resultado:new Set(),fase:new Set(),classe:new Set()};
 const tblSel={resultado:new Set(),fase:new Set(),classe:new Set()};
@@ -180,6 +180,9 @@ function clearTblFilters(){
 
 function filtered(){
   return DATA.filter(p=>{
+    // Status filter
+    if(statusFilter==='ativo'&&p.resultado==='Arquivado')return false;
+    if(statusFilter==='arquivado'&&p.resultado!=='Arquivado')return false;
     // Chart filter
     if(chartFilter.field==='resultado'&&p.resultado!==chartFilter.value)return false;
     if(chartFilter.field==='fase'&&p.fase_atual!==chartFilter.value)return false;
@@ -202,6 +205,12 @@ function filtered(){
 }
 
 // Filtro global (afeta KPIs + gráficos + tabela)
+function setSt(btn){
+  document.querySelectorAll('.st-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  statusFilter=btn.dataset.st;
+  page=0;update();
+}
 function update(){const d=filtered();renderKPIs(d);renderCharts(d);renderTable(tblFiltered())}
 function srt(k){sortKey===k?sortAsc=!sortAsc:(sortKey=k,sortAsc=true);update()}
 

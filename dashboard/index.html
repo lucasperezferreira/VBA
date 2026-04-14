@@ -72,6 +72,10 @@ td.r{text-align:right;font-variant-numeric:tabular-nums}
 .sim{color:#1E7E34;font-weight:700}
 .nao{color:#B91C1C;font-weight:700}
 footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-weight:500;border-top:1px solid var(--border);margin-top:8px}
+.status-toggle{display:flex;gap:4px;align-items:center}
+.st-btn{background:transparent;border:1px solid rgba(255,255,255,.15);color:#aaa;padding:5px 13px;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.st-btn:hover{border-color:var(--gold);color:#fff}
+.st-btn.active{background:var(--gold);border-color:var(--gold);color:var(--dark)}
 .fb{background:#2A2C29;border-bottom:2px solid #1a1c19;padding:0 40px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:56px}
 .fb-group{display:flex;flex-direction:column;gap:3px}
 .fb-group label{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#888}
@@ -143,6 +147,15 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
   </div>
 </header>
 <div class="fb">
+  <div class="fb-group">
+    <label>Status</label>
+    <div class="status-toggle">
+      <button class="st-btn active" data-st="all" onclick="setSt(this)">Todos</button>
+      <button class="st-btn" data-st="ativo" onclick="setSt(this)">Ativos</button>
+      <button class="st-btn" data-st="arquivado" onclick="setSt(this)">Arquivados</button>
+    </div>
+  </div>
+  <div class="fb-sep"></div>
   <div class="fb-group">
     <label>Buscar</label>
     <input class="fb-input" type="text" id="srch" placeholder="processo, reclamante, reclamada...">
