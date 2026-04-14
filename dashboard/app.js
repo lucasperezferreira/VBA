@@ -7,6 +7,7 @@ const bdg=(c,t)=>`<span class="b ${c}">${t}</span>`;
 let sortKey='numero_processo',sortAsc=true,page=0;
 let chartFilter={field:null,value:null};
 const sel={resultado:new Set(),fase:new Set(),classe:new Set()};
+const tblSel={resultado:new Set(),fase:new Set(),classe:new Set()};
 const charts={};
 const PAGE_SIZE=200;
 const COLS=['#F2A900','#D28B00','#373A36','#7A7670','#B0ADA7','#5C9BD6','#2E7D32','#C62828'];
@@ -59,17 +60,24 @@ document.addEventListener('DOMContentLoaded',()=>{
   const resultados=['Procedente','Improcedente','Arquivado','Ativo - Sem informação de sentença'];
   const fases=[...new Set(DATA.map(p=>p.fase_atual))].sort();
   const mats=[...new Set(DATA.map(p=>p.materia))].sort();
-  buildMs('resultado','resultado',resultados);
-  buildMs('fase','fase',fases);
-  buildMs('classe','classe',mats);
+  // Multi-selects globais (barra escura — afeta gráficos + tabela)
+  buildMs('resultado','resultado',resultados,sel);
+  buildMs('fase','fase',fases,sel);
+  buildMs('classe','classe',mats,sel);
+
+  // Multi-selects da tabela (tema claro — afeta só a tabela)
+  buildMsLt('tbl-resultado','resultado',resultados);
+  buildMsLt('tbl-fase','fase',fases);
+  buildMsLt('tbl-classe','classe',mats);
 
   document.getElementById('srch').addEventListener('input',()=>{page=0;update()});
+  document.getElementById('tblSrch').addEventListener('input',()=>{page=0;renderTable(tblFiltered())});
 
   // Fechar painéis ao clicar fora
   document.addEventListener('click',e=>{
     if(!e.target.closest('.ms-wrap')){
       document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
-      document.querySelectorAll('.ms-btn.open').forEach(b=>b.classList.remove('open'));
+      document.querySelectorAll('.ms-btn.open, .ms-btn-lt.open').forEach(b=>b.classList.remove('open'));
     }
   });
   document.getElementById('btnPrev').addEventListener('click',()=>{page=Math.max(0,page-1);renderTable(filtered())});
@@ -80,20 +88,36 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 // --- Filter ---
 // --- Multi-select helpers ---
-function buildMs(id,field,options){
+function buildMs(id,field,options,state){
   const panel=document.getElementById('ms-'+id+'-panel');
   options.forEach(opt=>{
     const div=document.createElement('div');
     div.className='ms-item';
-    div.dataset.val=opt;
     div.innerHTML=`<input type="checkbox" id="cb-${id}-${CSS.escape(opt)}"><span>${opt}</span>`;
     div.querySelector('input').addEventListener('change',e=>{
-      e.target.checked?sel[field].add(opt):sel[field].delete(opt);
+      e.target.checked?state[field].add(opt):state[field].delete(opt);
       div.classList.toggle('checked',e.target.checked);
-      updateMsBtn(id,field);
+      updateMsBtn(id,field,state);
       page=0;update();
     });
-    div.addEventListener('click',e=>{if(e.target.tagName!=='INPUT'){div.querySelector('input').click()}});
+    div.addEventListener('click',e=>{if(e.target.tagName!=='INPUT')div.querySelector('input').click()});
+    panel.appendChild(div);
+  });
+}
+
+function buildMsLt(id,field,options){
+  const panel=document.getElementById('ms-'+id+'-panel');
+  options.forEach(opt=>{
+    const div=document.createElement('div');
+    div.className='ms-item';
+    div.innerHTML=`<input type="checkbox" id="cb-${id}-${CSS.escape(opt)}"><span>${opt}</span>`;
+    div.querySelector('input').addEventListener('change',e=>{
+      e.target.checked?tblSel[field].add(opt):tblSel[field].delete(opt);
+      div.classList.toggle('checked',e.target.checked);
+      updateMsBtnLt(id,field);
+      page=0;renderTable(tblFiltered());
+    });
+    div.addEventListener('click',e=>{if(e.target.tagName!=='INPUT')div.querySelector('input').click()});
     panel.appendChild(div);
   });
 }
@@ -102,19 +126,49 @@ function toggleMs(id){
   const panel=document.getElementById('ms-'+id+'-panel');
   const btn=document.getElementById('ms-'+id+'-btn');
   const isOpen=panel.classList.contains('open');
-  // Fecha todos
   document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
-  document.querySelectorAll('.ms-btn.open').forEach(b=>b.classList.remove('open'));
+  document.querySelectorAll('.ms-btn.open,.ms-btn-lt.open').forEach(b=>b.classList.remove('open'));
   if(!isOpen){panel.classList.add('open');btn.classList.add('open')}
 }
 
-function updateMsBtn(id,field){
+function toggleMsLt(id){
+  const panel=document.getElementById('ms-'+id+'-panel');
+  const btn=document.getElementById('ms-'+id+'-btn');
+  const isOpen=panel.classList.contains('open');
+  document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.ms-btn.open,.ms-btn-lt.open').forEach(b=>b.classList.remove('open'));
+  if(!isOpen){panel.classList.add('open');btn.classList.add('open')}
+}
+
+function updateMsBtn(id,field,state){
   const btn=document.getElementById('ms-'+id+'-btn');
   const lbl=document.getElementById('ms-'+id+'-label');
-  const n=sel[field].size;
-  if(n===0){lbl.textContent=id==='resultado'?'Todos':'Todas';btn.classList.remove('active')}
-  else if(n===1){lbl.textContent=[...sel[field]][0];btn.classList.add('active')}
+  const n=state[field].size;
+  if(n===0){lbl.textContent=field==='resultado'?'Todos':'Todas';btn.classList.remove('active')}
+  else if(n===1){lbl.textContent=[...state[field]][0];btn.classList.add('active')}
   else{lbl.innerHTML=`<span class="ms-badge">${n}</span> selecionados`;btn.classList.add('active')}
+}
+
+function updateMsBtnLt(id,field){
+  const btn=document.getElementById('ms-'+id+'-btn');
+  const lbl=document.getElementById('ms-'+id+'-label');
+  const n=tblSel[field].size;
+  if(n===0){lbl.textContent=field==='resultado'?'Todos':'Todas';btn.classList.remove('active')}
+  else if(n===1){lbl.textContent=[...tblSel[field]][0];btn.classList.add('active')}
+  else{lbl.innerHTML=`<span class="ms-badge" style="background:var(--gold);color:var(--dark)">${n}</span> selecionados`;btn.classList.add('active')}
+}
+
+function clearTblFilters(){
+  ['resultado','fase','classe'].forEach(f=>{
+    tblSel[f].clear();
+    updateMsBtnLt('tbl-'+f,f);
+    document.querySelectorAll(`#ms-tbl-${f}-panel .ms-item`).forEach(d=>{
+      d.classList.remove('checked');
+      d.querySelector('input').checked=false;
+    });
+  });
+  document.getElementById('tblSrch').value='';
+  page=0;renderTable(tblFiltered());
 }
 
 function filtered(){
@@ -140,8 +194,22 @@ function filtered(){
   });
 }
 
-function update(){const d=filtered();renderKPIs(d);renderCharts(d);renderTable(d)}
+// Filtro global (afeta KPIs + gráficos + tabela)
+function update(){const d=filtered();renderKPIs(d);renderCharts(d);renderTable(tblFiltered())}
 function srt(k){sortKey===k?sortAsc=!sortAsc:(sortKey=k,sortAsc=true);update()}
+
+// Filtro da tabela: aplica filtered() + filtros específicos da tabela
+function tblFiltered(){
+  const base=filtered();
+  const s=document.getElementById('tblSrch').value.toLowerCase();
+  return base.filter(p=>{
+    if(tblSel.resultado.size&&!tblSel.resultado.has(p.resultado))return false;
+    if(tblSel.fase.size&&!tblSel.fase.has(p.fase_atual))return false;
+    if(tblSel.classe.size&&!tblSel.classe.has(p.materia))return false;
+    if(s&&!`${p.numero_processo} ${p.reclamante} ${p.reclamadas} ${p.cumprimento_sentenca||''}`.toLowerCase().includes(s))return false;
+    return true;
+  });
+}
 
 // --- KPIs ---
 function renderKPIs(d){

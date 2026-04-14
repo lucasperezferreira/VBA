@@ -100,6 +100,22 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
 .ms-item.checked{color:#fff;font-weight:700}
 .ms-item input[type=checkbox]{accent-color:var(--gold);width:14px;height:14px;cursor:pointer;flex-shrink:0}
 .ms-divider{height:1px;background:rgba(255,255,255,.08);margin:4px 0}
+.tbl-fb{background:var(--card);border-radius:12px;padding:14px 18px;border:1px solid var(--border);display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tbl-fb .fb-group label{color:var(--muted)}
+.ms-btn-lt{background:#fff;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:155px;justify-content:space-between;transition:all .15s;white-space:nowrap}
+.ms-btn-lt:hover,.ms-btn-lt.open{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,169,0,.1)}
+.ms-btn-lt.active{border-color:var(--gold);background:#FFFBEE;color:var(--dark);font-weight:700}
+.ms-btn-lt svg path{stroke:#6B6E68}
+.ms-btn-lt.active svg path,.ms-btn-lt:hover svg path{stroke:var(--gold)}
+.ms-btn-lt.open svg{transform:rotate(180deg)}
+.ms-panel-lt{background:#fff;border:1px solid var(--border);box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.ms-panel-lt .ms-item{color:var(--text)}
+.ms-panel-lt .ms-item:hover{background:#F7F6F4}
+.ms-panel-lt .ms-item.checked{color:var(--dark);font-weight:700}
+.tbl-fb-search{padding:7px 11px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:'Montserrat',sans-serif;font-weight:500;color:var(--text);background:#fff;transition:border-color .15s;min-width:220px}
+.tbl-fb-search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,169,0,.1)}
+.btn-clear-tbl{background:none;border:1px solid var(--border);color:var(--muted);padding:7px 12px;border-radius:8px;font-size:11px;font-family:'Montserrat',sans-serif;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-clear-tbl:hover{border-color:#C62828;color:#C62828}
 .chart-full{grid-column:1/-1}
 .chart-card{cursor:pointer}
 .chart-card h3 .hint{font-size:9px;font-weight:500;color:var(--muted);margin-left:6px;letter-spacing:0;text-transform:none}
@@ -184,6 +200,43 @@ footer{text-align:center;padding:24px;color:var(--muted);font-size:11px;font-wei
     <div class="chart-card chart-full"><h3>Processos por Setor (Reclamada)<span class="hint">clique para filtrar</span></h3><div class="chart-wrap" style="height:200px"><canvas id="cSetor"></canvas></div></div>
   </div>
   <div class="sec-title">Base de Processos</div>
+  <div class="tbl-fb">
+    <div class="fb-group">
+      <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px">Buscar</label>
+      <input class="tbl-fb-search" type="text" id="tblSrch" placeholder="processo, reclamante, reclamada...">
+    </div>
+    <div class="fb-group">
+      <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px">Resultado</label>
+      <div class="ms-wrap">
+        <button class="ms-btn-lt" id="ms-tbl-resultado-btn" onclick="toggleMsLt('tbl-resultado')">
+          <span id="ms-tbl-resultado-label">Todos</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="#6B6E68" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="ms-panel ms-panel-lt" id="ms-tbl-resultado-panel"></div>
+      </div>
+    </div>
+    <div class="fb-group">
+      <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px">Fase</label>
+      <div class="ms-wrap">
+        <button class="ms-btn-lt" id="ms-tbl-fase-btn" onclick="toggleMsLt('tbl-fase')">
+          <span id="ms-tbl-fase-label">Todas</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="#6B6E68" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="ms-panel ms-panel-lt" id="ms-tbl-fase-panel"></div>
+      </div>
+    </div>
+    <div class="fb-group">
+      <label style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:4px">Classe</label>
+      <div class="ms-wrap">
+        <button class="ms-btn-lt" id="ms-tbl-classe-btn" onclick="toggleMsLt('tbl-classe')">
+          <span id="ms-tbl-classe-label">Todas</span>
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="flex-shrink:0"><path d="M1 1l4 4 4-4" stroke="#6B6E68" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="ms-panel ms-panel-lt" id="ms-tbl-classe-panel"></div>
+      </div>
+    </div>
+    <button class="btn-clear-tbl" onclick="clearTblFilters()">✕ Limpar</button>
+  </div>
   <div class="tbl-card">
     <div class="tbl-hdr"><h3>Processos</h3><span class="tbl-count" id="tCount"></span><span style="display:flex;gap:6px"><button id="btnPrev" class="btn-xl" style="padding:5px 12px">&#8249;</button><button id="btnNext" class="btn-xl" style="padding:5px 12px">&#8250;</button></span></div>
     <div class="tbl-wrap">
