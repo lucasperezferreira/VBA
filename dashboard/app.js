@@ -12,6 +12,13 @@ const charts={};
 const PAGE_SIZE=200;
 const COLS=['#F2A900','#D28B00','#373A36','#7A7670','#B0ADA7','#5C9BD6','#2E7D32','#C62828'];
 
+function getYear(num){
+  if(!num)return null;
+  const p=num.split('.');
+  if(p.length>=2){const y=parseInt(p[1]);if(y>=2000&&y<=2035)return y}
+  return null;
+}
+
 function getSector(reclamadas){
   const r=(reclamadas||'').toLowerCase();
   if(/itaú|itau|bradesco|santander|safra|c6 consig|daycoval|fibra|banco original|bank of china|cetelem|bmw financeira|kirton|industrial e comercial|banco multiplo|banco fibra/.test(r))return'Financeiro';
@@ -286,6 +293,45 @@ function renderCharts(d){
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{position:'right',labels:{font:{size:11,family:'Montserrat'},padding:8}}},
       onClick:(_,els)=>{if(!els.length)return;setChartFilter('materia',matLabels[els[0].index])}}});
+
+  // Evolução por ano (linha)
+  destroyChart('cAno');
+  const byYear={};
+  d.forEach(p=>{const y=getYear(p.numero_processo);if(y){byYear[y]=(byYear[y]||0)+1}});
+  const years=Object.keys(byYear).map(Number).sort((a,b)=>a-b);
+  charts['cAno']=new Chart(document.getElementById('cAno'),{type:'bar',
+    data:{labels:years,datasets:[
+      {type:'bar',label:'Processos',data:years.map(y=>byYear[y]),backgroundColor:'rgba(242,169,0,.25)',borderColor:'#F2A900',borderWidth:2,borderRadius:5,order:2},
+      {type:'line',label:'Tendência',data:years.map(y=>byYear[y]),borderColor:'#373A36',borderWidth:2.5,pointBackgroundColor:'#373A36',pointRadius:4,tension:.35,fill:false,order:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:11,family:'Montserrat'},padding:12}}},
+      scales:{
+        x:{ticks:{font:{size:11,family:'Montserrat',weight:'700'}}},
+        y:{beginAtZero:true,ticks:{font:{size:10,family:'Montserrat'}}}
+      }}});
+
+  // Top reclamadas por ano (barras empilhadas)
+  destroyChart('cAnoRec');
+  const recCount={};
+  d.forEach(p=>{recCount[p.reclamadas]=(recCount[p.reclamadas]||0)+1});
+  const topRecs=Object.entries(recCount).sort((a,b)=>b[1]-a[1]).slice(0,6).map(r=>r[0]);
+  const recColors=['#F2A900','#D28B00','#373A36','#7A7670','#5C9BD6','#2E7D32'];
+  const recDatasets=topRecs.map((rec,i)=>({
+    label:rec.length>35?rec.slice(0,35)+'…':rec,
+    data:years.map(y=>{
+      return d.filter(p=>p.reclamadas===rec&&getYear(p.numero_processo)===y).length;
+    }),
+    backgroundColor:recColors[i],borderRadius:3,stack:'s'
+  }));
+  charts['cAnoRec']=new Chart(document.getElementById('cAnoRec'),{type:'bar',
+    data:{labels:years,datasets:recDatasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'Montserrat'},padding:10,boxWidth:12}}},
+      scales:{
+        x:{ticks:{font:{size:11,family:'Montserrat',weight:'700'}}},
+        y:{beginAtZero:true,stacked:true,ticks:{font:{size:10,family:'Montserrat'}}}
+      }}});
 
   // Setor
   destroyChart('cSetor');
