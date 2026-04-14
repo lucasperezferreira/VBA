@@ -56,6 +56,7 @@ td.r{text-align:right;font-variant-numeric:tabular-nums}
 .b-pp{background:#FFF8E1;color:#E65100}
 .b-im{background:#FFEBEE;color:#C62828}
 .b-ea{background:#E3F2FD;color:#1565C0}
+.b-ar{background:#ECEFF1;color:#546E7A}
 .b-f{background:#F3F0EB;color:var(--dark)}
 .sim{color:#2E7D32;font-weight:700}
 .nao{color:#C62828;font-weight:700}
@@ -84,7 +85,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
   <div class="kpi-grid">
     <div class="kpi"><div class="lbl">Total de Processos</div><div class="val" id="kTotal">—</div><div class="sub">carteira completa</div></div>
     <div class="kpi"><div class="lbl">Valor Total Estimado</div><div class="val" id="kValor">—</div><div class="sub">soma dos valores estimados</div></div>
-    <div class="kpi dark"><div class="lbl">Taxa de Procedência</div><div class="val" id="kProc">—</div><div class="sub">total + parcial / c/ resultado</div></div>
+    <div class="kpi dark"><div class="lbl">Taxa de Procedência</div><div class="val" id="kProc">—</div><div class="sub">sobre processos com sentença</div></div>
     <div class="kpi dark"><div class="lbl">Trânsito em Julgado</div><div class="val" id="kTJ">—</div><div class="sub">processos com TJ confirmado</div></div>
   </div>
   <div class="sec-title">Análise da Carteira</div>
@@ -92,19 +93,19 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
     <div class="chart-card"><h3>Resultado das Ações</h3><div class="chart-wrap"><canvas id="cResultado"></canvas></div></div>
     <div class="chart-card"><h3>Processos por Fase Processual</h3><div class="chart-wrap"><canvas id="cFase"></canvas></div></div>
     <div class="chart-card"><h3>Principais Reclamadas</h3><div class="chart-wrap"><canvas id="cReclamadas"></canvas></div></div>
-    <div class="chart-card"><h3>Principais Matérias Discutidas</h3><div class="chart-wrap"><canvas id="cMaterias"></canvas></div></div>
+    <div class="chart-card"><h3>Distribuição por Classe Processual</h3><div class="chart-wrap"><canvas id="cMaterias"></canvas></div></div>
   </div>
   <div class="sec-title">Base de Processos</div>
   <div class="filters">
     <div class="fg" style="flex:2"><label>Buscar</label><input type="text" id="srch" placeholder="nº processo, reclamante, reclamada..."></div>
     <div class="fg"><label>Fase</label><select id="sFase"><option value="">Todas</option></select></div>
-    <div class="fg"><label>Resultado</label><select id="sRes"><option value="">Todos</option><option>Procedente Total</option><option>Procedente Parcial</option><option>Improcedente</option><option>Em andamento</option></select></div>
-    <div class="fg"><label>Matéria</label><select id="sMat"><option value="">Todas</option></select></div>
+    <div class="fg"><label>Resultado</label><select id="sRes"><option value="">Todos</option><option>Procedente</option><option>Improcedente</option><option>Arquivado</option><option>Ativo - Sem informação de sentença</option></select></div>
+    <div class="fg"><label>Classe</label><select id="sMat"><option value="">Todas</option></select></div>
     <button class="btn-xl" onclick="exportXL()">&#11015; Exportar Excel</button>
   </div>
   <div style="height:12px"></div>
   <div class="tbl-card">
-    <div class="tbl-hdr"><h3>Processos</h3><span class="tbl-count" id="tCount"></span></div>
+    <div class="tbl-hdr"><h3>Processos</h3><span class="tbl-count" id="tCount"></span><span style="display:flex;gap:6px"><button id="btnPrev" class="btn-xl" style="padding:5px 12px">&#8249;</button><button id="btnNext" class="btn-xl" style="padding:5px 12px">&#8250;</button></span></div>
     <div class="tbl-wrap">
       <table>
         <thead><tr>
@@ -123,7 +124,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
           <th onclick="srt('calc_hom')">Cálc. Hom.</th>
           <th onclick="srt('vlr_hom')">Vlr. Hom. ↕</th>
           <th onclick="srt('vlr_inc')">Vlr. Inconv. ↕</th>
-          <th onclick="srt('materia')">Matéria ↕</th>
+          <th onclick="srt('materia')">Classe ↕</th>
         </tr></thead>
         <tbody id="tBody"></tbody>
       </table>
@@ -131,6 +132,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
   </div>
 </main>
 <footer>Juri Ativos Judiciais S.A. &nbsp;|&nbsp; CNPJ 52.026.131/0001-41 &nbsp;|&nbsp; www.juri.capital</footer>
+<script src="data.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
